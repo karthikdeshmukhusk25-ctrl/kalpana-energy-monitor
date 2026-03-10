@@ -560,7 +560,7 @@ window.openCountryPanel = function (countryName) {
             else if (p.tech === 'storage') iconStr = 'ti-battery-charging';
 
             potHtml += `
-            <div class="cp-zone-card" data-zoneid="${p.id}" data-lat="${p.lat}" data-lng="${p.lng}" style="border-left: 3px solid ${confColor};">
+            <div class="cp-zone-card" data-zone-id="${p.id}" data-lat="${p.lat}" data-lng="${p.lng}" style="border-left: 3px solid ${confColor}; cursor: pointer;">
                 <div class="cp-zone-left">
                     <div class="cp-zone-icon-box" style="color:${confColor}"><i class="ti ${iconStr}"></i></div>
                     <div class="cp-zone-text">
@@ -625,6 +625,15 @@ window.openCountryPanel = function (countryName) {
                     }
                 });
             }
+
+            // Add click listeners to zone cards
+            document.querySelectorAll('.cp-zone-card').forEach(card => {
+                card.style.cursor = 'pointer';
+                card.addEventListener('click', () => {
+                    const zoneId = card.dataset.zoneId;
+                    if (typeof openZonePanel === 'function') openZonePanel(zoneId);
+                });
+            });
         }, 50);
 
     } // End of else block
@@ -638,3 +647,481 @@ window.openCountryPanel = function (countryName) {
         setTimeout(() => { map.invalidateSize(); }, 350);
     }
 };
+
+function getCurrentCountryData() {
+    return window.getCountryData ? window.getCountryData(window.lastOpenedCountryName) : null;
+}
+
+function openZonePanel(zoneId) {
+
+    // Find zone data from current country
+    const country = getCurrentCountryData()
+    if (!country || !country.potentials) {
+        console.error('Country potentials not found');
+        return;
+    }
+    const zone = country.potentials.find(
+        z => z.id === zoneId
+    )
+
+    if (!zone) {
+        console.error('Zone not found:', zoneId)
+        return
+    }
+
+    // Populate panel header
+    document.getElementById('zone-panel-header')
+        .innerHTML = buildZonePanelHeader(zone)
+
+    // Build tabs
+    document.getElementById('zone-panel-tabs')
+        .innerHTML = buildZoneTabs()
+
+    // Load first tab content
+    loadZoneTab('overview', zone)
+
+    // Show panel
+    document.getElementById('zone-panel')
+        .classList.add('zone-panel-open')
+
+    // Add tab click listeners
+    document.querySelectorAll('.zone-tab')
+        .forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.zone-tab')
+                    .forEach(t => t.classList
+                        .remove('active'))
+                tab.classList.add('active')
+                loadZoneTab(tab.dataset.tab, zone)
+            })
+        })
+
+    console.log('Zone panel opened for:', zone.name)
+}
+
+function buildZonePanelHeader(zone) {
+    const techIcons = {
+        'solar': 'ti-sun',
+        'wind': 'ti-wind',
+        'offshore-wind': 'ti-ripple',
+        'biomass': 'ti-leaf',
+        'hydro': 'ti-droplet',
+        'storage': 'ti-battery-charging'
+    }
+
+    const techColours = {
+        'solar': '#F2994A',
+        'wind': '#2F80ED',
+        'offshore-wind': '#00B8A9',
+        'biomass': '#27AE60',
+        'hydro': '#2F80ED',
+        'storage': '#9B51E0'
+    }
+
+    const confidenceColour = {
+        'high': '#27AE60',
+        'medium': '#F2994A',
+        'low': '#EB5757'
+    }
+
+    const typeKey = zone.type || (zone.tech && zone.tech.includes('offshore') ? 'offshore-wind' : (zone.tech || 'solar'));
+
+    return `
+    <div class="zp-back" onclick="closeZonePanel()">
+      ← Potentials
+    </div>
+    <div class="zp-identity">
+      <div class="zp-tech-icon" style="
+        background: ${techColours[typeKey]}22;
+        border: 1px solid ${techColours[typeKey]}44;
+      ">
+        <i class="ti ${techIcons[typeKey] || 'ti-bolt'}" 
+           style="color:${techColours[typeKey]};
+           font-size:24px"></i>
+      </div>
+      <div class="zp-identity-text">
+        <div class="zp-name">${zone.name}</div>
+        <div class="zp-region">${zone.region || 'Unknown Region'}</div>
+        <div class="zp-chips">
+          <span class="zp-chip" style="
+            color:${techColours[typeKey]};
+            background:${techColours[typeKey]}22">
+            ${typeKey.replace('-', ' ')}
+          </span>
+          <span class="zp-chip" style="
+            color:${confidenceColour[zone.confidence]};
+            background:${confidenceColour[zone.confidence]}22">
+            ${zone.confidence} confidence
+          </span>
+          <span class="zp-chip">
+            ${zone.capacityMW || parseInt((zone.capacity || "0").replace(/,/g, ''), 10)} MW potential
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="zp-metrics">
+      <div class="zp-metric">
+        <div class="zp-metric-value">
+          ${zone.capacityMW || parseInt((zone.capacity || "0").replace(/,/g, ''), 10)} MW
+        </div>
+        <div class="zp-metric-label">POTENTIAL</div>
+      </div>
+      <div class="zp-metric">
+        <div class="zp-metric-value">
+          ${zone.capacityFactor || 32}%
+        </div>
+        <div class="zp-metric-label">CAP. FACTOR</div>
+      </div>
+      <div class="zp-metric">
+        <div class="zp-metric-value">
+          ${zone.gridDistanceKm || 12} km
+        </div>
+        <div class="zp-metric-label">GRID DIST.</div>
+      </div>
+      <div class="zp-metric">
+        <div class="zp-metric-value">
+          €${zone.lcoe || 45}/MWh
+        </div>
+        <div class="zp-metric-label">EST. LCOE</div>
+      </div>
+    </div>
+  `
+}
+
+function buildZoneTabs() {
+    const tabs = [
+        { id: 'overview', label: 'Overview' },
+        { id: 'site', label: 'Site Conditions' },
+        { id: 'economics', label: 'Economics' },
+        { id: 'policy', label: 'Policy & Permits' },
+        { id: 'ontology', label: 'Ontology' },
+        { id: 'intelligence', label: 'Intelligence' }
+    ]
+
+    return tabs.map((t, i) => `
+    <div class="zone-tab ${i === 0 ? 'active' : ''}" 
+         data-tab="${t.id}">
+      ${t.label}
+    </div>
+  `).join('')
+}
+
+function loadZoneTab(tabId, zone) {
+    const content = document
+        .getElementById('zone-panel-content')
+
+    if (tabId === 'overview') {
+        content.innerHTML = buildOverviewTab(zone)
+    } else if (tabId === 'site') {
+        content.innerHTML = buildSiteTab(zone)
+    } else if (tabId === 'economics') {
+        content.innerHTML = buildEconomicsTab(zone)
+    } else if (tabId === 'policy') {
+        content.innerHTML = buildPolicyTab(zone)
+    } else if (tabId === 'ontology') {
+        content.innerHTML = buildOntologyTab(zone)
+    } else if (tabId === 'intelligence') {
+        content.innerHTML = buildIntelligenceTab(zone)
+    }
+}
+
+function buildOverviewTab(zone) {
+    return `
+    <div class="zp-card zp-why-card">
+      <div class="zp-why-header">
+        <i class="ti ti-bulb" 
+           style="color:#27AE60"></i>
+        <span>WHY THIS ZONE</span>
+      </div>
+      <p class="zp-why-text">${zone.summary || 'Strong renewable resource fundamentals mapped with excellent existing infrastructure corridors forming a highly lucrative short term investment region.'}</p>
+    </div>
+    
+    <div class="zp-card">
+      <div class="zp-card-title">ZONE METRICS</div>
+      <div class="zp-metrics-grid">
+        <div class="zp-kpi">
+          <div class="zp-kpi-value">
+            ${zone.capacityMW || parseInt((zone.capacity || "0").replace(/,/g, ''), 10)} MW
+          </div>
+          <div class="zp-kpi-label">
+            CAPACITY POTENTIAL
+          </div>
+        </div>
+        <div class="zp-kpi">
+          <div class="zp-kpi-value">
+            ${zone.capacityFactor || 35}%
+          </div>
+          <div class="zp-kpi-label">
+            CAPACITY FACTOR
+          </div>
+        </div>
+        <div class="zp-kpi">
+          <div class="zp-kpi-value">
+            €${zone.capexPerMW || 0.8}M
+          </div>
+          <div class="zp-kpi-label">
+            CAPEX PER MW
+          </div>
+        </div>
+        <div class="zp-kpi">
+          <div class="zp-kpi-value">
+            ${zone.irr || '8-11'}%
+          </div>
+          <div class="zp-kpi-label">
+            EST. IRR RANGE
+          </div>
+        </div>
+        <div class="zp-kpi">
+          <div class="zp-kpi-value">
+            ${zone.gridDistanceKm || 12} km
+          </div>
+          <div class="zp-kpi-label">
+            GRID DISTANCE
+          </div>
+        </div>
+        <div class="zp-kpi">
+          <div class="zp-kpi-value">
+            €${zone.lcoe || 45}/MWh
+          </div>
+          <div class="zp-kpi-label">EST. LCOE</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="zp-card">
+      <div class="zp-card-title">
+        OVERALL RISK RATING
+      </div>
+      <div class="zp-risk-overview">
+        <div class="zp-risk-circle" 
+             style="--score:${zone.riskScore || 28};
+             --colour:${(zone.riskScore || 28) < 35 ?
+            '#27AE60' : (zone.riskScore || 28) < 65 ?
+                '#F2994A' : '#EB5757'}">
+          <span>${zone.riskScore || 28}</span>
+          <small>/100</small>
+        </div>
+        <div class="zp-risk-label">
+          <div class="zp-risk-title">
+            ${(zone.riskScore || 28) < 35 ? 'LOW RISK' :
+            (zone.riskScore || 28) < 65 ?
+                'MODERATE RISK' : 'HIGH RISK'}
+          </div>
+          <div class="zp-risk-sub">
+            Based on 6 assessed factors
+          </div>
+        </div>
+      </div>
+    </div>
+  `
+}
+
+function closeZonePanel() {
+    const zp = document.getElementById('zone-panel');
+    if (zp) zp.classList.remove('zone-panel-open')
+}
+
+function buildSiteTab(zone) {
+    const months = ['J', 'F', 'M', 'A', 'M', 'J',
+        'J', 'A', 'S', 'O', 'N', 'D']
+
+    const solarData = zone.solarProfile ||
+        [4.2, 5.1, 6.0, 6.8, 7.1, 6.9,
+            5.8, 5.9, 6.4, 5.8, 4.9, 4.1]
+    const windData = zone.windProfile ||
+        [5.2, 5.8, 6.1, 5.4, 4.8, 4.2,
+            3.9, 4.1, 4.8, 5.1, 5.6, 5.4]
+
+    const maxSolar = Math.max(...solarData)
+    const maxWind = Math.max(...windData)
+
+    const solarBars = solarData.map((v, i) => `
+    <div class="chart-bar" 
+         style="height:${(v / maxSolar) * 80}px;
+         background:linear-gradient(180deg,
+           #F2994A,rgba(242,153,74,0.3))"
+         title="${months[i]}: ${v} kWh/m²">
+    </div>
+  `).join('')
+
+    const windBars = windData.map((v, i) => `
+    <div class="chart-bar"
+         style="height:${(v / maxWind) * 80}px;
+         background:linear-gradient(180deg,
+           #2F80ED,rgba(47,128,237,0.3))"
+         title="${months[i]}: ${v} m/s">
+    </div>
+  `).join('')
+
+    const labels = months.map(m => `
+    <div class="chart-label">${m}</div>
+  `).join('')
+
+    return `
+    <div class="zp-card">
+      <div class="zp-card-title">
+        CURRENT CONDITIONS
+      </div>
+      <div class="zp-metrics-grid">
+        <div class="zp-kpi">
+          <div class="zp-kpi-value">
+            ${zone.solarIrradiance || '6.1'} 
+            kWh/m²
+          </div>
+          <div class="zp-kpi-label">
+            SOLAR IRRADIANCE
+          </div>
+        </div>
+        <div class="zp-kpi">
+          <div class="zp-kpi-value">
+            ${zone.temperature || '28'}°C
+          </div>
+          <div class="zp-kpi-label">
+            TEMPERATURE
+          </div>
+        </div>
+        <div class="zp-kpi">
+          <div class="zp-kpi-value">
+            ${zone.windSpeed || '4.2'} m/s
+          </div>
+          <div class="zp-kpi-label">WIND SPEED</div>
+        </div>
+        <div class="zp-kpi">
+          <div class="zp-kpi-value">
+            ${zone.rainfall || '380'} mm
+          </div>
+          <div class="zp-kpi-label">
+            ANNUAL RAINFALL
+          </div>
+        </div>
+      </div>
+      <div style="font-size:10px;
+        color:#555;font-style:italic;
+        margin-top:8px">
+        Dummy data · live API coming soon
+      </div>
+    </div>
+    
+    <div class="zp-card">
+      <div class="zp-card-title">
+        MONTHLY RESOURCE PROFILE
+      </div>
+      <div style="display:flex;gap:8px;
+        margin-bottom:12px">
+        <button class="chart-toggle active" 
+          onclick="toggleChart(this,'solar')">
+          Solar Irradiance
+        </button>
+        <button class="chart-toggle"
+          onclick="toggleChart(this,'wind')">
+          Wind Speed
+        </button>
+      </div>
+      <div id="solar-chart">
+        <div class="chart-container">
+          ${solarBars}
+        </div>
+        <div class="chart-labels">${labels}</div>
+      </div>
+      <div id="wind-chart" style="display:none">
+        <div class="chart-container">
+          ${windBars}
+        </div>
+        <div class="chart-labels">${labels}</div>
+      </div>
+    </div>
+    
+    <div class="zp-card">
+      <div class="zp-card-title">
+        TERRAIN & GEOGRAPHY
+      </div>
+      <div class="terrain-row">
+        <i class="ti ti-mountain"></i>
+        <div>
+          <div style="color:#888;font-size:11px">
+            TERRAIN TYPE
+          </div>
+          <div style="color:white;font-size:13px">
+            ${zone.terrain || 'Desert / Flat Plains'}
+          </div>
+        </div>
+        <span class="zp-chip" 
+          style="color:#27AE60;
+          background:rgba(39,174,96,0.1);
+          margin-left:auto">
+          Favourable
+        </span>
+      </div>
+      <div class="terrain-row">
+        <i class="ti ti-map-pin"></i>
+        <div>
+          <div style="color:#888;font-size:11px">
+            LAND USE
+          </div>
+          <div style="color:white;font-size:13px">
+            ${zone.landUse ||
+        'Government / Wasteland'}
+          </div>
+        </div>
+        <span class="zp-chip"
+          style="color:#27AE60;
+          background:rgba(39,174,96,0.1);
+          margin-left:auto">
+          Low Conflict
+        </span>
+      </div>
+      <div class="terrain-row">
+        <i class="ti ti-antenna"></i>
+        <div>
+          <div style="color:#888;font-size:11px">
+            GRID PROXIMITY
+          </div>
+          <div style="color:white;font-size:13px">
+            ${zone.gridDistanceKm || 12} km to nearest 
+            substation
+          </div>
+        </div>
+        <span class="zp-chip"
+          style="color:#F2994A;
+          background:rgba(242,153,74,0.1);
+          margin-left:auto">
+          Moderate
+        </span>
+      </div>
+      <div class="terrain-row">
+        <i class="ti ti-users"></i>
+        <div>
+          <div style="color:#888;font-size:11px">
+            POPULATION DENSITY
+          </div>
+          <div style="color:white;font-size:13px">
+            ${zone.populationDensity || 42} 
+            people/km²
+          </div>
+        </div>
+        <span class="zp-chip"
+          style="color:#27AE60;
+          background:rgba(39,174,96,0.1);
+          margin-left:auto">
+          Low
+        </span>
+      </div>
+    </div>
+  `
+}
+
+function buildEconomicsTab(zone) { return '<div class="zp-card"><div class="zp-card-title">Coming Soon</div></div>'; }
+function buildPolicyTab(zone) { return '<div class="zp-card"><div class="zp-card-title">Coming Soon</div></div>'; }
+function buildOntologyTab(zone) { return '<div class="zp-card"><div class="zp-card-title">Coming Soon</div></div>'; }
+function buildIntelligenceTab(zone) { return '<div class="zp-card"><div class="zp-card-title">Coming Soon</div></div>'; }
+
+window.toggleChart = function (btn, type) {
+    document.querySelectorAll('.chart-toggle')
+        .forEach(b => b.classList.remove('active'))
+    btn.classList.add('active')
+    document.getElementById('solar-chart')
+        .style.display = type === 'solar' ? '' : 'none'
+    document.getElementById('wind-chart')
+        .style.display = type === 'wind' ? '' : 'none'
+}
+

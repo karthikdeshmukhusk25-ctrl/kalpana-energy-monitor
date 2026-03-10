@@ -232,38 +232,9 @@
     ══════════════════════════════════════════════════ -->
     <div id="country-tooltip" class="country-hover-tooltip" style="display:none; position:fixed; z-index:9999;"></div>
     <div id="zone-panel">
-        <div class="zp-header-section">
-            <button class="zp-back-btn" id="zp-close-btn" onclick="closeZoneDetails()">
-                <i class="ti ti-arrow-left"></i>
-            </button>
-            <div class="zp-breadcrumb">POTENTIAL ZONES ›</div>
-            <div class="zp-identity">
-                <div class="zp-icon-box" id="zp-icon-box"><i class="ti ti-sun"></i></div>
-                <div class="zp-name-group">
-                    <h2 class="zp-name" id="zp-name">Zone Alpha</h2>
-                    <div class="zp-region" id="zp-region">Region Data</div>
-                    <div class="zp-tags" id="zp-tags"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="zp-tab-bar" id="zp-tabs">
-            <div class="zp-tab active" data-tab="overview">Overview</div>
-            <div class="zp-tab" data-tab="site">Site Conditions</div>
-            <div class="zp-tab" data-tab="econ">Economics</div>
-            <div class="zp-tab" data-tab="policy">Policy & Permits</div>
-            <div class="zp-tab" data-tab="ontology">Ontology</div>
-            <div class="zp-tab" data-tab="intel">Intelligence</div>
-        </div>
-
-        <div class="zp-content-area" id="zp-panes">
-            <div class="zp-pane active" id="zp-pane-overview"></div>
-            <div class="zp-pane" id="zp-pane-site"></div>
-            <div class="zp-pane" id="zp-pane-econ"></div>
-            <div class="zp-pane" id="zp-pane-policy"></div>
-            <div class="zp-pane" id="zp-pane-ontology"></div>
-            <div class="zp-pane" id="zp-pane-intel"></div>
-        </div>
+        <div id="zone-panel-header"></div>
+        <div id="zone-panel-tabs"></div>
+        <div id="zone-panel-content"></div>
     </div>
 
     <!-- ══════════════════════════════════════════════════
