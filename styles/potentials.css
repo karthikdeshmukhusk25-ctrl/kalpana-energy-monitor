@@ -1,0 +1,172 @@
+/* MAP MODE UI ELEMENTS */
+
+/* Floating Status Bar */
+.potentials-status-bar {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #141414;
+    border: 1px solid #2A2A2A;
+    border-radius: 40px;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    z-index: 1000;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    font-family: 'Inter', sans-serif;
+}
+
+.pots-status-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pots-status-name {
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.pots-status-dot {
+    color: #444;
+}
+
+.pots-status-count {
+    color: #27AE60;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.pots-status-filters {
+    display: flex;
+    gap: 6px;
+}
+
+.pots-filter-pill {
+    background: #242424;
+    color: #888;
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pots-filter-pill:hover {
+    background: #2A2A2A;
+    color: white;
+}
+
+.pots-filter-pill.active {
+    background: #2F80ED;
+    color: white;
+    font-weight: 500;
+}
+
+.pots-exit-btn {
+    background: transparent;
+    color: #EB5757;
+    border: 1px solid #EB5757;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pots-exit-btn:hover {
+    background: rgba(235, 87, 87, 0.1);
+}
+
+/* Collapsed Country Panel State */
+#country-panel.potentials-collapsed {
+    width: 60px;
+    cursor: pointer;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cp-collapsed-strip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    padding-top: 20px;
+    background: #1A1A1A;
+}
+
+.cp-collapsed-flag {
+    font-size: 24px;
+}
+
+/* Map Markers */
+.potentials-custom-icon {
+    background: transparent;
+    border: none;
+}
+
+.pot-marker-container {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pot-marker-inner {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    z-index: 2;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    border: 2px solid white;
+}
+
+.pot-marker-ring {
+    position: absolute;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    z-index: 1;
+    opacity: 0.2;
+}
+
+.pot-marker-ring.conf-high {
+    border: 2px solid #27AE60;
+    background: rgba(39, 174, 96, 0.2);
+    animation: pulseHigh 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pot-marker-ring.conf-medium {
+    border: 2px dashed #F2994A;
+}
+
+.pot-marker-ring.conf-low {
+    border: 1px dotted #EB5757;
+}
+
+@keyframes pulseHigh {
+    0% {
+        transform: scale(0.95);
+        opacity: 0.5;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 0.2;
+    }
+
+    100% {
+        transform: scale(0.95);
+        opacity: 0.5;
+    }
+}

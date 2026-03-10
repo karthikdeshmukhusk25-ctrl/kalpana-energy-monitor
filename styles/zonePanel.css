@@ -1,0 +1,769 @@
+/* ZONE DETAILS LEFT DRAWER UI */
+
+#zone-panel {
+    position: fixed;
+    top: 52px;
+    left: 0;
+    width: 420px;
+    height: calc(100vh - 52px - 48px);
+    background: #141414;
+    border-right: 1px solid #2A2A2A;
+    z-index: 800;
+    transform: translateX(-100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+}
+
+#zone-panel.open {
+    transform: translateX(0);
+}
+
+/* Header */
+.zp-header-section {
+    flex-shrink: 0;
+    background: #1A1A1A;
+    border-bottom: 1px solid #2A2A2A;
+    padding: 16px 20px;
+    position: relative;
+}
+
+.zp-back-btn {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    background: transparent;
+    border: none;
+    color: #888;
+    font-size: 20px;
+    cursor: pointer;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.zp-back-btn:hover {
+    color: white;
+}
+
+.zp-breadcrumb {
+    color: #888;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.zp-identity {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.zp-icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: #242424;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+    border: 1px solid #333;
+}
+
+.zp-name-group {
+    flex-grow: 1;
+}
+
+.zp-name {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: white;
+    line-height: 1.2;
+    margin-bottom: 6px;
+}
+
+.zp-region {
+    color: #888;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.zp-tags {
+    display: flex;
+    gap: 6px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+.zp-tag {
+    background: #2A2A2A;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 11px;
+    color: #ccc;
+    font-weight: 500;
+}
+
+.zp-tag.conf {
+    border-color: #27AE60;
+    color: #27AE60;
+    background: rgba(39, 174, 96, 0.1);
+}
+
+/* Tabs */
+.zp-tab-bar {
+    flex-shrink: 0;
+    display: flex;
+    background: #1A1A1A;
+    border-bottom: 1px solid #2A2A2A;
+    overflow-x: auto;
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.zp-tab-bar::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari */
+}
+
+.zp-tab {
+    padding: 14px 16px;
+    color: #888;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.zp-tab:hover {
+    color: white;
+}
+
+.zp-tab.active {
+    color: white;
+    font-weight: 600;
+    border-bottom-color: #2F80ED;
+}
+
+/* Content panes */
+.zp-content-area {
+    flex-grow: 1;
+    overflow-y: auto;
+    background: #141414;
+    position: relative;
+    padding: 20px;
+}
+
+.zp-pane {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.zp-pane.active {
+    display: block;
+}
+
+/* Cards */
+.zp-card {
+    background: #1A1A1A;
+    border: 1px solid #2A2A2A;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+}
+
+.zp-card-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Overview Tab Elements */
+.zp-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.zp-kpi-box {
+    background: #242424;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #333;
+}
+
+.zp-kpi-val {
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    color: white;
+    margin-bottom: 4px;
+}
+
+.zp-kpi-label {
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Donut & Risk Rows */
+.zp-risk-score-container {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.zp-donut-wrapper {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+}
+
+.zp-donut-svg {
+    transform: rotate(-90deg);
+}
+
+.zp-donut-bg {
+    fill: none;
+    stroke: #2a2a2a;
+    stroke-width: 6;
+}
+
+.zp-donut-progress {
+    fill: none;
+    stroke-width: 6;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1s ease-out;
+}
+
+.zp-donut-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.zp-donut-val {
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 1;
+}
+
+.zp-donut-lbl {
+    font-size: 10px;
+    color: #888;
+    margin-top: 2px;
+}
+
+.zp-risk-details {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.zp-risk-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.zp-risk-label {
+    font-size: 11px;
+    color: #ccc;
+    font-weight: 500;
+}
+
+.zp-risk-bar-container {
+    height: 6px;
+    background: #2A2A2A;
+    border-radius: 3px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.zp-risk-bar {
+    height: 100%;
+    border-radius: 3px;
+}
+
+/* Site Conditions Tab Elements */
+.zp-weather-kpis {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.zp-wkpi {
+    flex-grow: 1;
+    background: #242424;
+    border: 1px solid #333;
+    padding: 12px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.zp-wkpi-lbl {
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.zp-wkpi-val {
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    color: white;
+}
+
+.zp-chart-title {
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+}
+
+.zp-month-chart {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    height: 100px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 8px;
+    gap: 4px;
+}
+
+.zp-month-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    height: 100%;
+    flex-grow: 1;
+}
+
+.zp-month-bar-container {
+    flex-grow: 1;
+    width: 100%;
+    background: transparent;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.zp-month-bar {
+    width: 14px;
+    border-radius: 4px;
+    min-height: 4px;
+    transition: height 0.3s ease;
+}
+
+.zp-month-lbl {
+    font-size: 10px;
+    color: #666;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.zp-list-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px dashed #333;
+}
+
+.zp-list-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.zp-lr-lbl {
+    color: #888;
+    font-size: 13px;
+    width: 120px;
+    flex-shrink: 0;
+}
+
+.zp-lr-val {
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: right;
+}
+
+/* Economics Tab Elements */
+.zp-scenario-tabs {
+    display: flex;
+    background: #242424;
+    border-radius: 8px;
+    padding: 4px;
+    margin-bottom: 20px;
+}
+
+.zp-scen-tab {
+    flex: 1;
+    text-align: center;
+    padding: 6px 0;
+    font-size: 12px;
+    color: #888;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.zp-scen-tab.active {
+    background: #333;
+    color: white;
+    font-weight: 500;
+}
+
+.zp-scen-kpi-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.zp-sk-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.zp-sk-lbl {
+    font-size: 11px;
+    color: #888;
+}
+
+.zp-sk-val {
+    font-size: 18px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    color: white;
+}
+
+.zp-sk-val.highlight {
+    color: #27AE60;
+}
+
+.zp-stacked-bar {
+    display: flex;
+    height: 12px;
+    width: 100%;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+
+.zp-sb-seg {
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.zp-legend-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.zp-leg-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: #ccc;
+}
+
+.zp-leg-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.zp-offtake-tag {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    width: 100%;
+}
+
+.zp-offtake-tag.green {
+    background: rgba(39, 174, 96, 0.15);
+    color: #27AE60;
+    border: 1px solid rgba(39, 174, 96, 0.3);
+}
+
+.zp-offtake-tag.blue {
+    background: rgba(47, 128, 237, 0.15);
+    color: #2F80ED;
+    border: 1px solid rgba(47, 128, 237, 0.3);
+}
+
+/* Policy & Permits Tab Elements */
+.zp-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 10px;
+}
+
+.zp-tl-item {
+    display: flex;
+    gap: 12px;
+    position: relative;
+}
+
+.zp-tl-item:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 24px;
+    bottom: -16px;
+    width: 2px;
+    background: #333;
+}
+
+.zp-tl-item.done:not(:last-child)::before {
+    background: #27AE60;
+}
+
+.zp-tl-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #242424;
+    border: 2px solid #444;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: white;
+    z-index: 2;
+}
+
+.zp-tl-item.done .zp-tl-dot {
+    background: #27AE60;
+    border-color: #27AE60;
+}
+
+.zp-tl-item.active .zp-tl-dot {
+    border-color: #2F80ED;
+    background: rgba(47, 128, 237, 0.2);
+}
+
+.zp-tl-content {
+    padding-top: 2px;
+}
+
+.zp-tl-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: white;
+    margin-bottom: 4px;
+}
+
+.zp-tl-item.done .zp-tl-title {
+    color: #ccc;
+}
+
+.zp-tl-item.active .zp-tl-title {
+    color: #2F80ED;
+}
+
+.zp-tl-desc {
+    font-size: 12px;
+    color: #888;
+    line-height: 1.4;
+}
+
+.zp-risk-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.zp-rtag {
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.zp-rtag.high {
+    background: rgba(235, 87, 87, 0.15);
+    color: #EB5757;
+    border: 1px solid rgba(235, 87, 87, 0.3);
+}
+
+.zp-rtag.med {
+    background: rgba(242, 153, 74, 0.15);
+    color: #F2994A;
+    border: 1px solid rgba(242, 153, 74, 0.3);
+}
+
+.zp-rtag.low {
+    background: rgba(39, 174, 96, 0.15);
+    color: #27AE60;
+    border: 1px solid rgba(39, 174, 96, 0.3);
+}
+
+/* Ontology Tab Elements */
+.zp-ont-row {
+    background: #242424;
+    border: 1px solid #333;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    overflow: hidden;
+}
+
+.zp-ont-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: white;
+}
+
+.zp-ont-header i {
+    color: #888;
+    transition: transform 0.2s;
+}
+
+.zp-ont-count {
+    margin-left: auto;
+    font-size: 11px;
+    color: #888;
+}
+
+.zp-ont-body {
+    display: none;
+    padding: 0 16px 12px 40px;
+}
+
+.zp-ont-row.toggle-active .zp-ont-body {
+    display: block;
+}
+
+.zp-ont-row.toggle-active .zp-ont-header i {
+    color: #2F80ED;
+}
+
+.zp-vendor-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px dashed #333;
+}
+
+.zp-vendor-item:last-child {
+    border-bottom: none;
+}
+
+.zp-ven-name {
+    font-size: 12px;
+    color: #ccc;
+    flex: 1;
+}
+
+.zp-ven-price {
+    font-size: 12px;
+    color: white;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+}
+
+/* Intelligence Tab Elements */
+.zp-action-btn {
+    background: #2F80ED;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.zp-action-btn:hover {
+    background: #2566BE;
+}
+
+.zp-news-signal {
+    display: grid;
+    grid-template-areas:
+        "dot title"
+        ". meta";
+    grid-template-columns: 8px 1fr;
+    gap: 4px 12px;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px dashed #333;
+}
+
+.zp-news-signal:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.zp-ns-dot {
+    grid-area: dot;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #EB5757;
+    margin-top: 4px;
+}
+
+.zp-ns-title {
+    grid-area: title;
+    font-size: 13px;
+    color: white;
+    line-height: 1.4;
+}
+
+.zp-ns-meta {
+    grid-area: meta;
+    font-size: 11px;
+    color: #888;
+}

@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kalpana – Energy Intelligence Header</title>
+    <meta name="description"
+        content="Kalpana Energy Intelligence dashboard header with timeline, region, segment, search, alerts and theme controls." />
+    <!-- 1. Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- 3. Leaflet MarkerCluster CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+
+    <!-- 5. Tabler Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+
+    <!-- 6. Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono:wght@400;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet" />
+
+    <!-- 7. All CSS files -->
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="styles/map.css" />
+    <link rel="stylesheet" href="styles/drawer.css" />
+    <link rel="stylesheet" href="styles/countryPanel.css" />
+    <link rel="stylesheet" href="styles/potentials.css" />
+</head>
+
+<body>
+
+    <header class="header" id="header">
+
+        <!-- ══════════════ LEFT SECTION ══════════════ -->
+        <div class="header-section left-header">
+
+            <!-- Timeline pills: 1H 12H 1D 1W -->
+            <div class="timeline-selector" id="timeline-selector" role="group" aria-label="Time range selector">
+                <button class="timeline-pill" data-period="1h" id="pill-1h">1h</button>
+                <button class="timeline-pill active" data-period="12h" id="pill-12h">12h</button>
+                <button class="timeline-pill" data-period="1d" id="pill-1d">1d</button>
+                <button class="timeline-pill" data-period="1w" id="pill-1w">1w</button>
+            </div>
+
+            <!-- Refresh / Update button + version -->
+            <div class="update-group">
+                <button class="btn-update" id="btn-update" title="Refresh data">
+                    <i class="ti ti-refresh refresh-icon" id="refresh-icon"></i>
+                    Update
+                </button>
+                <span class="version-info" id="version-info">v1.0 · Updated 06 Mar 00:00</span>
+            </div>
+
+            <!-- Region dropdown -->
+            <div class="dropdown-wrapper" id="region-wrapper">
+                <button class="dropdown-trigger" id="region-trigger" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="dropdown-icon"><i class="ti ti-world"></i></span>
+                    <span class="dropdown-label" id="region-label">Global</span>
+                    <span class="dropdown-arrow"><i class="ti ti-chevron-down"></i></span>
+                </button>
+                <ul class="dropdown-menu" id="region-menu" role="listbox" aria-label="Region">
+                    <li class="dropdown-item active" role="option" data-value="Global">Global</li>
+                    <li class="dropdown-item" role="option" data-value="Europe">Europe</li>
+                    <li class="dropdown-item" role="option" data-value="Nordics">Nordics</li>
+                    <li class="dropdown-item" role="option" data-value="Middle East">Middle East</li>
+                    <li class="dropdown-item" role="option" data-value="Asia">Asia</li>
+                    <li class="dropdown-item" role="option" data-value="Americas">Americas</li>
+                </ul>
+            </div>
+
+            <!-- Segment pills group (shown as dropdown in Figma but user wants pills) -->
+            <div class="segment-pills" id="segment-pills" role="group" aria-label="Energy segment">
+                <button class="segment-pill active" data-segment="all">All</button>
+                <button class="segment-pill" data-segment="renewables">Renewables</button>
+                <button class="segment-pill" data-segment="oil-gas">Oil &amp; Gas</button>
+                <button class="segment-pill" data-segment="grid-storage">Grid &amp; Storage</button>
+                <button class="segment-pill" data-segment="policy">Policy</button>
+            </div>
+        </div>
+
+        <!-- ══════════════ RIGHT SECTION ══════════════ -->
+        <div class="header-section right-header">
+
+            <!-- Search bar -->
+            <div class="search-bar-wrapper" id="search-bar-wrapper">
+                <div class="search-bar" id="search-bar">
+                    <span class="search-icon"><i class="ti ti-search"></i></span>
+                    <input type="text" class="search-input" id="search-input" placeholder="Find..."
+                        aria-label="Search" />
+                    <button class="search-btn-icon" id="search-filter" title="Filters" aria-label="Filters">
+                        <i class="ti ti-adjustments-horizontal"></i>
+                    </button>
+                    <button class="search-btn-icon" id="search-clear" title="Clear" aria-label="Clear search">
+                        <i class="ti ti-x"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Data sources dropdown -->
+            <div class="dropdown-wrapper" id="datasources-wrapper">
+                <button class="dropdown-trigger" id="datasources-trigger" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="dropdown-icon"><i class="ti ti-info-circle"></i></span>
+                    <span class="dropdown-label">Data sources</span>
+                    <span class="dropdown-arrow"><i class="ti ti-chevron-down"></i></span>
+                </button>
+                <ul class="dropdown-menu" id="datasources-menu" role="listbox" aria-label="Data sources">
+                    <li class="dropdown-item active" role="option">All Sources</li>
+                    <li class="dropdown-item" role="option">ENTSO-E</li>
+                    <li class="dropdown-item" role="option">Bloomberg</li>
+                    <li class="dropdown-item" role="option">Refinitiv</li>
+                    <li class="dropdown-item" role="option">Internal</li>
+                </ul>
+            </div>
+
+            <!-- Panels dropdown -->
+            <div class="dropdown-wrapper" id="panels-wrapper">
+                <button class="dropdown-trigger" id="panels-trigger" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="dropdown-icon"><i class="ti ti-layout-grid"></i></span>
+                    <span class="dropdown-label">Panels</span>
+                    <span class="dropdown-arrow"><i class="ti ti-chevron-down"></i></span>
+                </button>
+                <ul class="dropdown-menu" id="panels-menu" role="listbox" aria-label="Panels">
+                    <li class="dropdown-item active" role="option">All Panels</li>
+                    <li class="dropdown-item" role="option">Market Overview</li>
+                    <li class="dropdown-item" role="option">Risk Heatmap</li>
+                    <li class="dropdown-item" role="option">Supply Curve</li>
+                </ul>
+            </div>
+
+            <!-- Theme toggle -->
+            <div class="theme-toggle-group" id="theme-toggle-group">
+                <button class="theme-btn active" id="btn-light" title="Light mode" aria-label="Switch to light mode">
+                    <i class="ti ti-sun"></i>
+                </button>
+                <button class="theme-btn" id="btn-dark" title="Dark mode" aria-label="Switch to dark mode">
+                    <i class="ti ti-moon"></i>
+                </button>
+            </div>
+
+            <!-- Alerts bell -->
+            <div class="alerts-wrapper" id="alerts-wrapper">
+                <button class="icon-btn alerts-btn" id="alerts-btn" aria-label="Alerts" aria-haspopup="true"
+                    aria-expanded="false">
+                    <i class="ti ti-bell"></i>
+                    <span class="alert-badge" id="alert-badge">2</span>
+                </button>
+                <div class="alerts-panel" id="alerts-panel" hidden>
+                    <div class="alerts-header">
+                        <span>Alerts</span>
+                        <span class="alerts-count">2 new</span>
+                    </div>
+                    <div class="alert-item">
+                        <div class="alert-dot critical"></div>
+                        <div class="alert-content">
+                            <div class="alert-title">Enercon DK-04 · Emergency shutdown</div>
+                            <div class="alert-meta">Critical · 2 min ago</div>
+                        </div>
+                    </div>
+                    <div class="alert-item">
+                        <div class="alert-dot warning"></div>
+                        <div class="alert-content">
+                            <div class="alert-title">Nordic grid frequency deviation +0.4 Hz</div>
+                            <div class="alert-meta">Warning · 14 min ago</div>
+                        </div>
+                    </div>
+                    <button class="alerts-dismiss">Dismiss all</button>
+                </div>
+            </div>
+
+        </div>
+
+    </header>
+    <!-- end header -->
+
+    <!-- ══════════════════════════════════════════════════
+     MAP ZONE
+    ══════════════════════════════════════════════════ -->
+    <div id="map-zone">
+
+        <!-- Leaflet map container -->
+        <div id="map"></div>
+
+        <!-- Left sidebar -->
+        <div id="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-title">Layer control</span>
+                <div class="sidebar-controls">
+                    <button class="sidebar-btn" title="Help" aria-label="Help"><i
+                            class="ti ti-question-mark"></i></button>
+                </div>
+            </div>
+            <div class="sidebar-body" id="sidebar-body"></div>
+        </div>
+        <!-- Sidebar toggle tab -->
+        <div id="sidebar-toggle-tab" title="Toggle sidebar" aria-label="Toggle sidebar">‹</div>
+
+        <!-- Legend strip (bottom centre) -->
+        <div id="legend-strip">
+            <span class="legend-label">Legend</span>
+        </div>
+
+        <!-- Energy mix widget (top right) -->
+        <div id="energy-widget">
+            <div id="widget-content"></div>
+            <div class="widget-nav">
+                <button class="widget-nav-btn" id="widget-prev" aria-label="Previous view">‹</button>
+                <span class="widget-nav-title" id="widget-nav-title">⚡ Energy Mix</span>
+                <button class="widget-nav-btn" id="widget-next" aria-label="Next view">›</button>
+            </div>
+        </div>
+
+        <!-- Map controls (right, vertically centred) -->
+        <div id="map-controls">
+            <button class="map-ctrl-btn" id="ctrl-zoom-in" title="Zoom in" aria-label="Zoom in"><i
+                    class="ti ti-plus"></i></button>
+            <button class="map-ctrl-btn" id="ctrl-zoom-out" title="Zoom out" aria-label="Zoom out"><i
+                    class="ti ti-minus"></i></button>
+            <button class="map-ctrl-btn" id="ctrl-reset" title="Reset view" aria-label="Reset view"><i
+                    class="ti ti-world"></i></button>
+            <button class="map-ctrl-btn" id="ctrl-pin" title="Pinned zones" aria-label="Pinned zones"
+                data-tooltip="Coming soon"><i class="ti ti-map-pin"></i></button>
+        </div>
+
+    </div><!-- end map-zone -->
+
+    <!-- ══════════════════════════════════════════════════
+     ZONE DETAILS DRAWER (Left side)
+    ══════════════════════════════════════════════════ -->
+    <div id="country-tooltip" class="country-hover-tooltip" style="display:none; position:fixed; z-index:9999;"></div>
+    <div id="zone-panel">
+        <div class="zp-header-section">
+            <button class="zp-back-btn" id="zp-close-btn" onclick="closeZoneDetails()">
+                <i class="ti ti-arrow-left"></i>
+            </button>
+            <div class="zp-breadcrumb">POTENTIAL ZONES ›</div>
+            <div class="zp-identity">
+                <div class="zp-icon-box" id="zp-icon-box"><i class="ti ti-sun"></i></div>
+                <div class="zp-name-group">
+                    <h2 class="zp-name" id="zp-name">Zone Alpha</h2>
+                    <div class="zp-region" id="zp-region">Region Data</div>
+                    <div class="zp-tags" id="zp-tags"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="zp-tab-bar" id="zp-tabs">
+            <div class="zp-tab active" data-tab="overview">Overview</div>
+            <div class="zp-tab" data-tab="site">Site Conditions</div>
+            <div class="zp-tab" data-tab="econ">Economics</div>
+            <div class="zp-tab" data-tab="policy">Policy & Permits</div>
+            <div class="zp-tab" data-tab="ontology">Ontology</div>
+            <div class="zp-tab" data-tab="intel">Intelligence</div>
+        </div>
+
+        <div class="zp-content-area" id="zp-panes">
+            <div class="zp-pane active" id="zp-pane-overview"></div>
+            <div class="zp-pane" id="zp-pane-site"></div>
+            <div class="zp-pane" id="zp-pane-econ"></div>
+            <div class="zp-pane" id="zp-pane-policy"></div>
+            <div class="zp-pane" id="zp-pane-ontology"></div>
+            <div class="zp-pane" id="zp-pane-intel"></div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════
+     ANALYTICS DRAWER
+    ══════════════════════════════════════════════════ -->
+    <div id="analytics-drawer">
+
+        <!-- HANDLE STRIP -->
+        <div id="drawer-handle">
+            <div class="drawer-drag-pill"></div>
+            <span class="drawer-handle-label">Analytics &amp; Intelligence</span>
+            <span class="drawer-handle-chevron"><i class="ti ti-chevron-up"></i></span>
+        </div>
+
+        <!-- CONTENT AREA -->
+        <div id="drawer-content">
+
+            <!-- ROW 1: 4 Widgets -->
+            <div class="widget-grid">
+
+                <!-- ── WIDGET 1: LIVE NEWS ── -->
+                <div class="widget-card" id="widget-live-news">
+                    <div class="widget-header">
+                        <span class="widget-title">Live News</span>
+                        <span class="widget-meta">· 2 min ago</span>
+                    </div>
+                    <!-- Channel pills -->
+                    <div class="news-channel-pills">
+                        <button class="channel-pill active" data-channel="BLOOMBERG">BLOOMBERG</button>
+                        <button class="channel-pill" data-channel="SKYNEWS">SKYNEWS</button>
+                        <button class="channel-pill" data-channel="EURONEWS">EURONEWS</button>
+                        <button class="channel-pill" data-channel="DW">DW</button>
+                        <button class="channel-pill" data-channel="FRANCE24">FRANCE24</button>
+                        <button class="channel-pill" data-channel="ALARABIYA">ALARABIYA</button>
+                        <button class="channel-pill" data-channel="REPUBLIC BHARAT">REPUBLIC BHARAT</button>
+                        <button class="channel-pill" data-channel="ALJAZEERA">ALJAZEERA</button>
+                    </div>
+                    <!-- Video area -->
+                    <div class="news-video-area">
+                        <iframe id="news-iframe"
+                            src="https://www.youtube.com/embed/live_stream?channel=UCnUYZLuoy1rq1aVMwx4aTzw&autoplay=1&mute=1"
+                            allow="autoplay; encrypted-media" allowfullscreen title="Live News Stream"></iframe>
+                        <button class="volume-btn" id="news-volume-btn" title="Toggle mute">
+                            <i class="ti ti-volume-off"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ── WIDGET 2: POWER & GAS PRICES ── -->
+                <div class="widget-card" id="widget-prices">
+                    <div class="widget-header">
+                        <span class="widget-title">Power &amp; Gas Prices</span>
+                        <div class="widget-controls">
+                            <div class="time-pills">
+                                <button class="time-pill" data-period="1h">1H</button>
+                                <button class="time-pill active" data-period="12h">12H</button>
+                                <button class="time-pill" data-period="1d">1D</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="price-list">
+                        <div class="price-row" data-key="dk1">
+                            <div class="price-row-left">
+                                <span class="price-row-name">Power DK1 Spot</span>
+                                <span class="price-tag power">POWER</span>
+                            </div>
+                            <div class="price-row-right">
+                                <span class="price-value">44.45 €/MWh</span>
+                                <span class="price-change down">▼ −3.1%</span>
+                            </div>
+                        </div>
+                        <div class="price-row" data-key="ttf">
+                            <div class="price-row-left">
+                                <span class="price-row-name">TTF Gas Front-Month</span>
+                                <span class="price-tag gas">GAS</span>
+                            </div>
+                            <div class="price-row-right">
+                                <span class="price-value">32.48 €/MWh</span>
+                                <span class="price-change up">▲ +1.85%</span>
+                            </div>
+                        </div>
+                        <div class="price-row" data-key="carbon">
+                            <div class="price-row-left">
+                                <span class="price-row-name">EU ETS Carbon</span>
+                                <span class="price-tag carbon">CARBON</span>
+                            </div>
+                            <div class="price-row-right">
+                                <span class="price-value">70.57 €/t</span>
+                                <span class="price-change up">▲ +1.85%</span>
+                            </div>
+                        </div>
+                        <div class="price-row" data-key="de">
+                            <div class="price-row-left">
+                                <span class="price-row-name">Power DE Spot</span>
+                                <span class="price-tag power">POWER</span>
+                            </div>
+                            <div class="price-row-right">
+                                <span class="price-value">91.20 €/MWh</span>
+                                <span class="price-change down">▼ −1.4%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── WIDGET 3: ENERGY EQUITIES ── -->
+                <div class="widget-card" id="widget-equities">
+                    <div class="widget-header" style="position:relative">
+                        <span class="widget-title">Energy Equities</span>
+                        <div class="widget-controls">
+                            <div class="tab-strip">
+                                <button class="tab-btn active" data-tab="index">Index</button>
+                                <button class="tab-btn" data-tab="watchlist">Watchlist</button>
+                                <button class="tab-btn-add" id="eq-add-btn" title="Add to watchlist">+</button>
+                            </div>
+                        </div>
+                        <!-- Watchlist add popup -->
+                        <div class="eq-popup" id="watchlist-add-popup">
+                            <div class="eq-popup-header">
+                                <span class="eq-popup-title">Add to Watchlist</span>
+                                <button class="eq-popup-close">×</button>
+                            </div>
+                            <input type="text" class="eq-search-input" placeholder="Search company or ticker..." />
+                            <div class="eq-suggestions-label">Suggestions</div>
+                            <div class="eq-suggestion-row">
+                                <div class="eq-radio selected"></div>
+                                <div class="eq-suggestion-info">
+                                    <span class="eq-suggestion-name">Ørsted A/S</span>
+                                    <span class="eq-suggestion-ticker">ORSTED · CPH</span>
+                                </div>
+                            </div>
+                            <div class="eq-suggestion-row">
+                                <div class="eq-radio"></div>
+                                <div class="eq-suggestion-info">
+                                    <span class="eq-suggestion-name">Vestas Wind Systems</span>
+                                    <span class="eq-suggestion-ticker">VWS · CPH</span>
+                                </div>
+                            </div>
+                            <div class="eq-suggestion-row">
+                                <div class="eq-radio"></div>
+                                <div class="eq-suggestion-info">
+                                    <span class="eq-suggestion-name">RWE AG</span>
+                                    <span class="eq-suggestion-ticker">RWE · FRA</span>
+                                </div>
+                            </div>
+                            <div class="eq-suggestion-row">
+                                <div class="eq-radio"></div>
+                                <div class="eq-suggestion-info">
+                                    <span class="eq-suggestion-name">Enel SpA</span>
+                                    <span class="eq-suggestion-ticker">ENEL · MIL</span>
+                                </div>
+                            </div>
+                            <button class="eq-add-btn">+ Add selected</button>
+                        </div>
+                    </div>
+
+                    <!-- Index tab pane -->
+                    <div class="tab-pane active" id="eq-tab-index">
+                        <div class="index-section">
+                            <div class="index-label-row">
+                                <span class="index-name" id="index-display-name">S&amp;P Global Clean Energy
+                                    Index</span>
+                                <button class="index-change-btn" id="index-change-btn">
+                                    <i class="ti ti-chevron-down" style="font-size:10px"></i> Change
+                                </button>
+                            </div>
+                            <!-- Index change dropdown -->
+                            <div class="eq-popup" id="index-change-dropdown"></div>
+                            <div class="index-value">989.47 pts</div>
+                            <div class="index-changes">
+                                <span class="index-badge down">▼ −1.43% (1D)</span>
+                                <span class="index-badge down">▼ −10.7% (1M)</span>
+                            </div>
+                        </div>
+                        <div class="index-chart-area">
+                            <canvas id="index-chart-canvas" style="height:60px"></canvas>
+                        </div>
+                        <div class="index-chart-labels">
+                            <span>23 Feb</span><span>03 Mar</span>
+                        </div>
+                        <div class="stocks-section">
+                            <div class="stocks-label">Stocks</div>
+                            <div class="stock-row">
+                                <div class="stock-left">
+                                    <span class="stock-name">Ørsted</span>
+                                    <div class="stock-sub">
+                                        <span class="stock-ticker">ORSTED · CPH</span>
+                                        <span class="stock-sector">Offshore Wind</span>
+                                    </div>
+                                </div>
+                                <div class="stock-right">
+                                    <span class="stock-price">150.85 DKK</span>
+                                    <span class="stock-change down">▼ −3.1%</span>
+                                </div>
+                                <div class="stock-sparkline"><canvas data-key="orsted"
+                                        style="width:40px;height:20px"></canvas></div>
+                            </div>
+                            <div class="stock-row">
+                                <div class="stock-left">
+                                    <span class="stock-name">Vestas</span>
+                                    <div class="stock-sub">
+                                        <span class="stock-ticker">VWS · CPH</span>
+                                        <span class="stock-sector">Wind Turbines</span>
+                                    </div>
+                                </div>
+                                <div class="stock-right">
+                                    <span class="stock-price">131.30 DKK</span>
+                                    <span class="stock-change up">▲ +7.23%</span>
+                                </div>
+                                <div class="stock-sparkline"><canvas data-key="vestas"
+                                        style="width:40px;height:20px"></canvas></div>
+                            </div>
+                            <div class="stock-row">
+                                <div class="stock-left">
+                                    <span class="stock-name">RWE</span>
+                                    <div class="stock-sub">
+                                        <span class="stock-ticker">RWE · FRA</span>
+                                        <span class="stock-sector">Renewables</span>
+                                    </div>
+                                </div>
+                                <div class="stock-right">
+                                    <span class="stock-price">34.20 EUR</span>
+                                    <span class="stock-change down">▼ −1.12%</span>
+                                </div>
+                                <div class="stock-sparkline"><canvas data-key="rwe"
+                                        style="width:40px;height:20px"></canvas></div>
+                            </div>
+                            <div class="stock-row">
+                                <div class="stock-left">
+                                    <span class="stock-name">Enel</span>
+                                    <div class="stock-sub">
+                                        <span class="stock-ticker">ENEL · MIL</span>
+                                        <span class="stock-sector">Renewables</span>
+                                    </div>
+                                </div>
+                                <div class="stock-right">
+                                    <span class="stock-price">7.45 EUR</span>
+                                    <span class="stock-change up">▲ +0.34%</span>
+                                </div>
+                                <div class="stock-sparkline"><canvas data-key="enel"
+                                        style="width:40px;height:20px"></canvas></div>
+                            </div>
+                            <div class="stock-row">
+                                <div class="stock-left">
+                                    <span class="stock-name">Equinor</span>
+                                    <div class="stock-sub">
+                                        <span class="stock-ticker">EQNR · OSL</span>
+                                        <span class="stock-sector">Oil &amp; Offshore Wind</span>
+                                    </div>
+                                </div>
+                                <div class="stock-right">
+                                    <span class="stock-price">28.90 NOK</span>
+                                    <span class="stock-change down">▼ −0.89%</span>
+                                </div>
+                                <div class="stock-sparkline"><canvas data-key="equinor"
+                                        style="width:40px;height:20px"></canvas></div>
+                            </div>
+                            <div class="stocks-scroll-hint">── scroll for more ──</div>
+                        </div>
+                    </div>
+
+                    <!-- Watchlist tab pane -->
+                    <div class="tab-pane" id="eq-tab-watchlist">
+                        <div class="stocks-label">Your Watchlist</div>
+                        <div class="stocks-section">
+                            <div class="stock-row">
+                                <div class="stock-left">
+                                    <span class="stock-name">Ørsted</span>
+                                    <div class="stock-sub">
+                                        <span class="stock-ticker">ORSTED · CPH</span>
+                                        <span class="stock-sector">Offshore Wind</span>
+                                    </div>
+                                </div>
+                                <div class="stock-right">
+                                    <span class="stock-price">150.85 DKK</span>
+                                    <span class="stock-change down">▼ −3.1%</span>
+                                </div>
+                                <div class="stock-sparkline"><canvas data-key="orsted"
+                                        style="width:40px;height:20px"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── WIDGET 4: NEWS & MEDIA ── -->
+                <div class="widget-card" id="widget-news">
+                    <div class="widget-header">
+                        <span class="widget-title">News &amp; Media</span>
+                        <div class="widget-controls">
+                            <div class="tab-strip">
+                                <button class="tab-btn active" data-tab="news">News</button>
+                                <button class="tab-btn" data-tab="media">Media</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- News tab -->
+                    <div class="tab-pane active" id="news-tab-news">
+                        <div class="news-filter-pills">
+                            <button class="filter-pill active">All</button>
+                            <button class="filter-pill">Wind</button>
+                            <button class="filter-pill">Solar</button>
+                            <button class="filter-pill">Policy</button>
+                            <button class="filter-pill">Grid</button>
+                        </div>
+                        <div class="news-feed-list">
+                            <div class="news-item">
+                                <div class="news-outlet">Reuters · 2h ago</div>
+                                <div class="news-headline">Denmark approves new 3GW offshore wind tender for 2027
+                                </div>
+                                <div class="news-chips">
+                                    <span class="news-chip">DK</span>
+                                    <span class="news-chip">Offshore Wind</span>
+                                </div>
+                            </div>
+                            <div class="news-item">
+                                <div class="news-outlet">Bloomberg · 4h ago</div>
+                                <div class="news-headline">RWE secures €2.1bn financing for German solar portfolio
+                                </div>
+                                <div class="news-chips">
+                                    <span class="news-chip">DE</span>
+                                    <span class="news-chip">Solar</span>
+                                </div>
+                            </div>
+                            <div class="news-item">
+                                <div class="news-outlet">FT · 6h ago</div>
+                                <div class="news-headline">CIP raises record €12bn for energy transition fund</div>
+                                <div class="news-chips">
+                                    <span class="news-chip">FUNDS</span>
+                                    <span class="news-chip">Offshore Wind</span>
+                                </div>
+                            </div>
+                            <div class="news-item">
+                                <div class="news-outlet">Reuters · 8h ago</div>
+                                <div class="news-headline">EU carbon prices fall 18% amid ETS reform uncertainty
+                                </div>
+                                <div class="news-chips">
+                                    <span class="news-chip">EU</span>
+                                    <span class="news-chip">Carbon</span>
+                                </div>
+                            </div>
+                            <div class="news-item">
+                                <div class="news-outlet">Bloomberg · 12h ago</div>
+                                <div class="news-headline">Vestas wins 800MW turbine order for UK North Sea project
+                                </div>
+                                <div class="news-chips">
+                                    <span class="news-chip">UK</span>
+                                    <span class="news-chip">Wind</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Media tab -->
+                    <div class="tab-pane" id="news-tab-media">
+                        <div class="media-grid">
+                            <div class="media-cell">
+                                <div class="media-thumb"><i class="ti ti-player-play media-thumb-icon"></i></div>
+                                <span class="media-label">IEA World Energy Outlook 2026</span>
+                            </div>
+                            <div class="media-cell">
+                                <div class="media-thumb"><i class="ti ti-player-play media-thumb-icon"></i></div>
+                                <span class="media-label">CIP Fund IV Launch</span>
+                            </div>
+                            <div class="media-cell">
+                                <div class="media-thumb"><i class="ti ti-player-play media-thumb-icon"></i></div>
+                                <span class="media-label">Ørsted Q4 2025 Results</span>
+                            </div>
+                            <div class="media-cell">
+                                <div class="media-thumb"><i class="ti ti-player-play media-thumb-icon"></i></div>
+                                <span class="media-label">BNEF Offshore Wind Summit</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- widgets combined into single grid -->
+                <div class="widget-card" id="widget-auctions">
+                    <div class="widget-header">
+                        <span class="widget-title">AUCTIONS & TENDERS</span>
+                        <div class="widget-controls filter-pills">
+                            <button class="filter-pill active">All</button>
+                            <button class="filter-pill">Wind</button>
+                            <button class="filter-pill">Solar</button>
+                            <button class="filter-pill">Storage</button>
+                        </div>
+                    </div>
+                    <div class="widget-body scrollable-body">
+                        <div class="auction-row">
+                            <div class="auction-left">
+                                <div class="auction-country">🇩🇰 Denmark</div>
+                                <div class="auction-name">Nearshore Wind CfD Round 4</div>
+                                <div class="auction-tech">Wind</div>
+                            </div>
+                            <div class="auction-right">
+                                <div class="auction-date">15 Apr 2026</div>
+                                <div class="auction-status status-announced">Announced</div>
+                            </div>
+                            <div class="auction-tooltip">
+                                <div class="auction-tt-title">Nearshore Wind CfD Round 4</div>
+                                <div class="auction-tt-meta">Capacity: 800 MW &middot; Price cap: DKK 900/MWh</div>
+                                <div class="auction-tt-note">Notes: "Fourth CfD round targeting nearshore sites"
+                                </div>
+                            </div>
+                        </div>
+                        <div class="auction-row">
+                            <div class="auction-left">
+                                <div class="auction-country">🇩🇪 Germany</div>
+                                <div class="auction-name">Onshore Wind BNetzA Round 3</div>
+                                <div class="auction-tech">Wind</div>
+                            </div>
+                            <div class="auction-right">
+                                <div class="auction-date">01 May 2026</div>
+                                <div class="auction-status status-ongoing">Ongoing</div>
+                            </div>
+                            <div class="auction-tooltip">
+                                <div class="auction-tt-title">Onshore Wind BNetzA Round 3</div>
+                                <div class="auction-tt-meta">Capacity: 2,100 MW &middot; No price cap</div>
+                                <div class="auction-tt-note">Notes: "Federal auction under EEG 2023 framework"</div>
+                            </div>
+                        </div>
+                        <div class="auction-row">
+                            <div class="auction-left">
+                                <div class="auction-country">🇬🇧 United Kingdom</div>
+                                <div class="auction-name">AR6 Offshore Wind CfD</div>
+                                <div class="auction-tech">Wind</div>
+                            </div>
+                            <div class="auction-right">
+                                <div class="auction-date">20 May 2026</div>
+                                <div class="auction-status status-announced">Announced</div>
+                            </div>
+                            <div class="auction-tooltip">
+                                <div class="auction-tt-title">AR6 Offshore Wind CfD</div>
+                                <div class="auction-tt-meta">Capacity: 5,000 MW &middot; Strike price TBD</div>
+                                <div class="auction-tt-note">Notes: "Sixth allocation round, offshore wind focus"
+                                </div>
+                            </div>
+                        </div>
+                        <div class="auction-row">
+                            <div class="auction-left">
+                                <div class="auction-country">🇳🇱 Netherlands</div>
+                                <div class="auction-name">SDE++ Solar Round 2026</div>
+                                <div class="auction-tech">Solar</div>
+                            </div>
+                            <div class="auction-right">
+                                <div class="auction-date">30 Apr 2026</div>
+                                <div class="auction-status status-closing">Closing Soon</div>
+                            </div>
+                            <div class="auction-tooltip">
+                                <div class="auction-tt-title">SDE++ Solar Round 2026</div>
+                                <div class="auction-tt-meta">Capacity: 3,000 MW &middot; Max €0.06/kWh</div>
+                                <div class="auction-tt-note">Notes: "Broad renewable support scheme, solar dominant"
+                                </div>
+                            </div>
+                        </div>
+                        <div class="auction-row">
+                            <div class="auction-left">
+                                <div class="auction-country">🇳🇴 Norway</div>
+                                <div class="auction-name">Utsira Nord Floating Offshore</div>
+                                <div class="auction-tech">Wind</div>
+                            </div>
+                            <div class="auction-right">
+                                <div class="auction-date">10 Jun 2026</div>
+                                <div class="auction-status status-announced">Announced</div>
+                            </div>
+                            <div class="auction-tooltip">
+                                <div class="auction-tt-title">Utsira Nord Floating Offshore</div>
+                                <div class="auction-tt-meta">Capacity: 1,500 MW &middot; Price TBD</div>
+                                <div class="auction-tt-note">Notes: "First floating offshore wind tender in Norway"
+                                </div>
+                            </div>
+                        </div>
+                        <div class="auction-row">
+                            <div class="auction-left">
+                                <div class="auction-country">🇫🇷 France</div>
+                                <div class="auction-name">AO CRE 6 Offshore Wind</div>
+                                <div class="auction-tech">Wind</div>
+                            </div>
+                            <div class="auction-right">
+                                <div class="auction-date">25 May 2026</div>
+                                <div class="auction-status status-ongoing">Ongoing</div>
+                            </div>
+                            <div class="auction-tooltip">
+                                <div class="auction-tt-title">AO CRE 6 Offshore Wind</div>
+                                <div class="auction-tt-meta">Capacity: 1,000 MW &middot; €120/MWh ceiling</div>
+                                <div class="auction-tt-note">Notes: "Sixth offshore tender under CRE framework"
+                                </div>
+                            </div>
+                        </div>
+                        <div class="auction-row">
+                            <div class="auction-left">
+                                <div class="auction-country">🇮🇳 India</div>
+                                <div class="auction-name">SECI Solar-Wind Hybrid</div>
+                                <div class="auction-tech">Solar</div>
+                            </div>
+                            <div class="auction-right">
+                                <div class="auction-date">15 Jun 2026</div>
+                                <div class="auction-status status-announced">Announced</div>
+                            </div>
+                            <div class="auction-tooltip">
+                                <div class="auction-tt-title">SECI Solar-Wind Hybrid</div>
+                                <div class="auction-tt-meta">Capacity: 2,500 MW &middot; INR 2.80/kWh ceiling</div>
+                                <div class="auction-tt-note">Notes: "SECI hybrid tender combining solar and wind"
+                                </div>
+                            </div>
+                        </div>
+                        <div class="auction-row">
+                            <div class="auction-left">
+                                <div class="auction-country">🇦🇺 Australia</div>
+                                <div class="auction-name">NSW Renewable Energy Zone</div>
+                                <div class="auction-tech">Storage</div>
+                            </div>
+                            <div class="auction-right">
+                                <div class="auction-date">20 Jun 2026</div>
+                                <div class="auction-status status-announced">Announced</div>
+                            </div>
+                            <div class="auction-tooltip">
+                                <div class="auction-tt-title">NSW Renewable Energy Zone</div>
+                                <div class="auction-tt-meta">Capacity: 1,000 MW storage &middot; AUD 120/MWh</div>
+                                <div class="auction-tt-note">Notes: "Battery storage component of NSW REZ program"
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="widget-card" id="widget-pipeline">
+                    <div class="widget-header">
+                        <span class="widget-title">PROJECT PIPELINE</span>
+                        <div class="widget-controls dropdown-wrap">
+                            <button class="dropdown-btn">Nordics ▾</button>
+                        </div>
+                    </div>
+                    <div class="widget-body pipeline-body">
+                        <!-- Top section — stage bars -->
+                        <div class="stage-row"
+                            data-tooltip="1. Thor Offshore Wind (1000 MW) - RWE - DK&#10;2. Hesselø Offshore Wind (800-1200 MW) - TBD - DK&#10;3. Sørlige Nordsjø II (1500 MW) - Ventyr - NO">
+                            <span class="stage-name">Development</span>
+                            <div class="stage-bar-bg">
+                                <div class="stage-bar-fill" style="width: 35%"></div>
+                            </div>
+                            <span class="stage-meta">42 projects &middot; 28.4 GW</span>
+                        </div>
+                        <div class="stage-row"
+                            data-tooltip="1. Aflandshage (300 MW) - HOFOR - DK&#10;2. Storlandet (400 MW) - OX2 - SE&#10;3. Kemi Ajos (72 MW) - OX2 - FI">
+                            <span class="stage-name">FID Reached</span>
+                            <div class="stage-bar-bg">
+                                <div class="stage-bar-fill" style="width: 12%"></div>
+                            </div>
+                            <span class="stage-meta">8 projects &middot; 6.1 GW</span>
+                        </div>
+                        <div class="stage-row"
+                            data-tooltip="1. Dogger Bank C (1200 MW) - Equinor/SSE - UK/NO&#10;2. Vesterhav Syd (170 MW) - Vattenfall - DK&#10;3. Vesterhav Nord (176 MW) - Vattenfall - DK">
+                            <span class="stage-name">Construction</span>
+                            <div class="stage-bar-bg">
+                                <div class="stage-bar-fill" style="width: 8%"></div>
+                            </div>
+                            <span class="stage-meta">5 projects &middot; 3.8 GW</span>
+                        </div>
+                        <div class="stage-row"
+                            data-tooltip="1. Horns Rev 3 (407 MW) - Vattenfall - DK&#10;2. Kriegers Flak (605 MW) - Vattenfall - DK&#10;3. Markbygden 1101 (3400 MW) - Svevind - SE">
+                            <span class="stage-name">Operational</span>
+                            <div class="stage-bar-bg">
+                                <div class="stage-bar-fill" style="width: 55%"></div>
+                            </div>
+                            <span class="stage-meta">61 projects &middot; 41.2 GW</span>
+                        </div>
+
+                        <div class="pipeline-divider"></div>
+
+                        <div class="pipeline-total-row">
+                            <span class="total-label">TOTAL</span>
+                            <span class="total-val">116 projects &middot; 79.5 GW</span>
+                        </div>
+
+                        <div class="pipeline-tech-breakdown">
+                            <div class="tech-row">
+                                <span class="tech-label">Offshore Wind</span>
+                                <div class="tech-bar-bg">
+                                    <div class="tech-bar-fill bg-blue-dark" style="width: 45%"></div>
+                                </div>
+                                <span class="tech-pct">45%</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">Onshore Wind</span>
+                                <div class="tech-bar-bg">
+                                    <div class="tech-bar-fill bg-blue-light" style="width: 28%"></div>
+                                </div>
+                                <span class="tech-pct">28%</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">Solar PV</span>
+                                <div class="tech-bar-bg">
+                                    <div class="tech-bar-fill bg-yellow" style="width: 18%"></div>
+                                </div>
+                                <span class="tech-pct">18%</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">Storage</span>
+                                <div class="tech-bar-bg">
+                                    <div class="tech-bar-fill bg-teal" style="width: 9%"></div>
+                                </div>
+                                <span class="tech-pct">9%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="widget-card" id="widget-policy">
+                    <div class="widget-header">
+                        <span class="widget-title">POLICY & REGULATION</span>
+                        <div class="widget-controls dropdown-wrap">
+                            <button class="dropdown-btn">Europe ▾</button>
+                        </div>
+                    </div>
+                    <div class="widget-body scrollable-body policy-body">
+                        <div class="policy-item">
+                            <div class="policy-tags"><span class="policy-tag">AUCTION</span><span
+                                    class="policy-tag">WIND</span></div>
+                            <div class="policy-headline">Denmark launches offshore wind CfD consultation for 2026
+                                Nearshore Round 4</div>
+                            <div class="policy-meta">🇩🇰 DK &middot; 1 day ago &middot; Danish Energy Agency</div>
+                            <div class="policy-tooltip">
+                                <div class="policy-tt-title">WHY IT MATTERS</div>
+                                <div class="policy-tt-note">New auction design may lower strike prices, improving
+                                    bankability for developers</div>
+                            </div>
+                        </div>
+                        <div class="policy-item">
+                            <div class="policy-tags"><span class="policy-tag">GRID</span><span
+                                    class="policy-tag">PERMIT</span></div>
+                            <div class="policy-headline">Germany accelerates grid expansion permits under new
+                                planning law — 6 months faster approval</div>
+                            <div class="policy-meta">🇩🇪 DE &middot; 2 days ago &middot; Bundesnetzagentur</div>
+                            <div class="policy-tooltip">
+                                <div class="policy-tt-title">WHY IT MATTERS</div>
+                                <div class="policy-tt-note">Faster grid connection reduces development risk for
+                                    onshore wind and solar</div>
+                            </div>
+                        </div>
+                        <div class="policy-item">
+                            <div class="policy-tags"><span class="policy-tag">SUBSIDY</span><span
+                                    class="policy-tag">SOLAR</span></div>
+                            <div class="policy-headline">Netherlands extends SDE++ support scheme through 2028 with
+                                increased solar allocation</div>
+                            <div class="policy-meta">🇳🇱 NL &middot; 3 days ago &middot; RVO</div>
+                            <div class="policy-tooltip">
+                                <div class="policy-tt-title">WHY IT MATTERS</div>
+                                <div class="policy-tt-note">Extended subsidy runway improves revenue visibility for
+                                    solar project finance</div>
+                            </div>
+                        </div>
+                        <div class="policy-item">
+                            <div class="policy-tags"><span class="policy-tag">TAX</span><span
+                                    class="policy-tag">ESG</span></div>
+                            <div class="policy-headline">EU Carbon Border Adjustment Mechanism enters full
+                                enforcement from January 2027</div>
+                            <div class="policy-meta">🇪🇺 EU &middot; 4 days ago &middot; European Commission</div>
+                            <div class="policy-tooltip">
+                                <div class="policy-tt-title">WHY IT MATTERS</div>
+                                <div class="policy-tt-note">Raises cost of carbon-intensive imports, improving
+                                    competitiveness of EU clean energy</div>
+                            </div>
+                        </div>
+                        <div class="policy-item">
+                            <div class="policy-tags"><span class="policy-tag">AUCTION</span><span
+                                    class="policy-tag">STORAGE</span></div>
+                            <div class="policy-headline">UK Capacity Market T-4 auction clears at record £75/kW —
+                                storage dominates</div>
+                            <div class="policy-meta">🇬🇧 UK &middot; 5 days ago &middot; National Grid ESO</div>
+                            <div class="policy-tooltip">
+                                <div class="policy-tt-title">WHY IT MATTERS</div>
+                                <div class="policy-tt-note">Strong capacity market prices improve returns for
+                                    battery storage investments</div>
+                            </div>
+                        </div>
+                        <div class="policy-item">
+                            <div class="policy-tags"><span class="policy-tag">PERMIT</span><span
+                                    class="policy-tag">WIND</span></div>
+                            <div class="policy-headline">Norway opens Utsira Nord licensing round for floating
+                                offshore wind — 3 areas available</div>
+                            <div class="policy-meta">🇳🇴 NO &middot; 6 days ago &middot; Norwegian Energy Authority
+                            </div>
+                            <div class="policy-tooltip">
+                                <div class="policy-tt-title">WHY IT MATTERS</div>
+                                <div class="policy-tt-note">First commercial floating wind market opens significant
+                                    new investment opportunity</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="widget-card" id="widget-risk">
+                    <div class="widget-header">
+                        <span class="widget-title">RISK & ALERTS</span>
+                        <div class="widget-controls risk-filters">
+                            <button class="risk-filter-btn" data-type="conflict">🔴</button>
+                            <button class="risk-filter-btn" data-type="policy">🟠</button>
+                            <button class="risk-filter-btn" data-type="price">🟡</button>
+                            <button class="risk-filter-btn" data-type="grid">🟣</button>
+                            <button class="risk-filter-btn" data-type="weather">🌩</button>
+                        </div>
+                    </div>
+                    <div class="widget-body scrollable-body risk-body">
+                        <div class="risk-item" data-type="conflict" data-country="Middle East">
+                            <div class="risk-item-header">
+                                <div class="risk-dot bg-red"></div>
+                                <div class="risk-center">
+                                    <div class="risk-title">Red Sea shipping disruptions affecting LNG tanker routes
+                                        to Europe</div>
+                                    <div class="risk-meta">Middle East &middot; 2h ago</div>
+                                </div>
+                                <div class="risk-right">
+                                    <span class="risk-severity high">High</span>
+                                </div>
+                            </div>
+                            <div class="risk-detail-panel">
+                                <div class="risk-impact-label">Impact:</div>
+                                <ul class="risk-impact-list">
+                                    <li>LNG supply delays to EU terminals</li>
+                                    <li>upward pressure on TTF gas prices</li>
+                                    <li>potential impact on energy security margins</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="risk-item" data-type="policy" data-country="Germany">
+                            <div class="risk-item-header">
+                                <div class="risk-dot bg-orange"></div>
+                                <div class="risk-center">
+                                    <div class="risk-title">Germany delays offshore wind grid connection by 18
+                                        months — Bundesnetzagentur</div>
+                                    <div class="risk-meta">DE &middot; 4h ago</div>
+                                </div>
+                                <div class="risk-right">
+                                    <span class="risk-severity high">High</span>
+                                </div>
+                            </div>
+                            <div class="risk-detail-panel">
+                                <div class="risk-impact-label">Impact:</div>
+                                <ul class="risk-impact-list">
+                                    <li>Developer timelines pushed back</li>
+                                    <li>potential FID delays on 3 major projects</li>
+                                    <li>financing risk increases</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="risk-item" data-type="price" data-country="Europe">
+                            <div class="risk-item-header">
+                                <div class="risk-dot bg-yellow"></div>
+                                <div class="risk-center">
+                                    <div class="risk-title">EU power prices spike 40% in 3 days due to cold snap
+                                        across Central Europe</div>
+                                    <div class="risk-meta">EU &middot; 6h ago</div>
+                                </div>
+                                <div class="risk-right">
+                                    <span class="risk-severity med">Med</span>
+                                </div>
+                            </div>
+                            <div class="risk-detail-panel">
+                                <div class="risk-impact-label">Impact:</div>
+                                <ul class="risk-impact-list">
+                                    <li>Short-term revenue boost for operational assets</li>
+                                    <li>grid stress risk rising</li>
+                                    <li>demand response mechanisms activated</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="risk-item" data-type="grid" data-country="Denmark">
+                            <div class="risk-item-header">
+                                <div class="risk-dot bg-purple"></div>
+                                <div class="risk-center">
+                                    <div class="risk-title">Denmark-Germany interconnector Kontek operating at
+                                        reduced capacity — maintenance</div>
+                                    <div class="risk-meta">DK/DE &middot; 8h ago</div>
+                                </div>
+                                <div class="risk-right">
+                                    <span class="risk-severity med">Med</span>
+                                </div>
+                            </div>
+                            <div class="risk-detail-panel">
+                                <div class="risk-impact-label">Impact:</div>
+                                <ul class="risk-impact-list">
+                                    <li>Power price spread between DK1 and DE widens</li>
+                                    <li>curtailment risk for Danish wind assets increases</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="risk-item" data-type="weather" data-country="Norway">
+                            <div class="risk-item-header">
+                                <div class="risk-dot bg-weather"></div>
+                                <div class="risk-center">
+                                    <div class="risk-title">Storm Ingunn forecast for North Sea — offshore wind
+                                        operations suspended</div>
+                                    <div class="risk-meta">NO/UK &middot; 10h ago</div>
+                                </div>
+                                <div class="risk-right">
+                                    <span class="risk-severity med">Med</span>
+                                </div>
+                            </div>
+                            <div class="risk-detail-panel">
+                                <div class="risk-impact-label">Impact:</div>
+                                <ul class="risk-impact-list">
+                                    <li>Temporary generation loss for North Sea offshore assets</li>
+                                    <li>monitoring required for asset damage</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="risk-item" data-type="policy" data-country="UK">
+                            <div class="risk-item-header">
+                                <div class="risk-dot bg-orange"></div>
+                                <div class="risk-center">
+                                    <div class="risk-title">UK CfD contract terms under review — indexation clause
+                                        may be removed</div>
+                                    <div class="risk-meta">UK &middot; 12h ago</div>
+                                </div>
+                                <div class="risk-right">
+                                    <span class="risk-severity low">Low</span>
+                                </div>
+                            </div>
+                            <div class="risk-detail-panel">
+                                <div class="risk-impact-label">Impact:</div>
+                                <ul class="risk-impact-list">
+                                    <li>Revenue certainty reduced for future UK offshore projects</li>
+                                    <li>investor confidence monitoring required</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="risk-item" data-type="conflict" data-country="Asia">
+                            <div class="risk-item-header">
+                                <div class="risk-dot bg-red"></div>
+                                <div class="risk-center">
+                                    <div class="risk-title">Myanmar energy infrastructure targeted in ongoing
+                                        conflict</div>
+                                    <div class="risk-meta">Asia &middot; 1d ago</div>
+                                </div>
+                                <div class="risk-right">
+                                    <span class="risk-severity high">High</span>
+                                </div>
+                            </div>
+                            <div class="risk-detail-panel">
+                                <div class="risk-impact-label">Impact:</div>
+                                <ul class="risk-impact-list">
+                                    <li>Asset damage risk for regional energy infrastructure</li>
+                                    <li>no direct EU portfolio exposure</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="risk-item" data-type="weather" data-country="Spain">
+                            <div class="risk-item-header">
+                                <div class="risk-dot bg-weather"></div>
+                                <div class="risk-center">
+                                    <div class="risk-title">Drought conditions in Iberian Peninsula reducing
+                                        hydropower output by 35%</div>
+                                    <div class="risk-meta">ES/PT &middot; 1d ago</div>
+                                </div>
+                                <div class="risk-right">
+                                    <span class="risk-severity low">Low</span>
+                                </div>
+                            </div>
+                            <div class="risk-detail-panel">
+                                <div class="risk-impact-label">Impact:</div>
+                                <ul class="risk-impact-list">
+                                    <li>Increased gas generation compensating</li>
+                                    <li>upward pressure on Iberian power prices</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- end .widget-grid -->
+
+        </div><!-- end #drawer-content -->
+    </div><!-- end #analytics-drawer -->
+
+    <!-- 2. Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- 4. Leaflet MarkerCluster JS -->
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+
+    <!-- 8 to 13. Application Scripts -->
+    <script src="data/countries.js"></script>
+    <script src="scripts/dataFetch.js"></script>
+    <script src="scripts/map.js"></script>
+    <script src="scripts/countryPanel.js"></script>
+    <script src="scripts/potentials.js"></script>
+    <script src="scripts/drawer.js"></script>
+    <script src="scripts/widgets.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

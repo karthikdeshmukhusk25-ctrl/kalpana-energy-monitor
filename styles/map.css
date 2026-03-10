@@ -1,0 +1,753 @@
+/* ═══════════════════════════════════════════════
+   KALPANA MAP SECTION — styles/map.css
+   ═══════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu+Mono:wght@400;700&display=swap');
+
+/* ── Reset ── */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* ═══════════════════════════════
+   LAYOUT
+   ═══════════════════════════════ */
+body {
+    font-family: 'Ubuntu Mono', monospace;
+    background: #1a1a1a;
+    color: #fff;
+    overflow: hidden;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+[data-theme="light"] body,
+body[data-theme="light"] {
+    background: #e8e8e8;
+}
+
+/* Header sits at top, fixed — handled by style.css */
+#header {
+    z-index: 1000;
+}
+
+/* ─────────────────────────────────────────────────
+   MAP ZONE — fixed between header and drawer
+   bottom is controlled by JS: 48px (collapsed)
+   or a larger value when drawer is open.
+───────────────────────────────────────────────── */
+#map-zone {
+    position: fixed;
+    top: 52px;
+    left: 0;
+    width: 100%;
+    bottom: 48px;
+    height: auto;
+    z-index: 1;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: #141414;
+    overflow: hidden;
+    transition: bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Leaflet map fills the zone */
+#map {
+    width: 100%;
+    height: 100%;
+}
+
+/* Bottom strip — hidden: analytics drawer replaces it */
+#bottom-strip {
+    display: none;
+}
+
+.bottom-placeholder {
+    display: none;
+}
+
+/* ═══════════════════════════════
+   LEFT SIDEBAR — LAYER CONTROL
+   ═══════════════════════════════ */
+#sidebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200px;
+    height: 100%;
+    background: #1A1A1A;
+    border-right: 1px solid #2A2A2A;
+    overflow-y: auto;
+    z-index: 400;
+    display: flex;
+    flex-direction: column;
+    transition: width 0.25s ease, transform 0.25s ease;
+}
+
+#sidebar.collapsed {
+    width: 0;
+    transform: translateX(-200px);
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    border-bottom: 1px solid #2a2a2a;
+    flex-shrink: 0;
+}
+
+.sidebar-title {
+    color: #888;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+}
+
+.sidebar-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.sidebar-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background: #242424;
+    border: 1px solid #333;
+    border-radius: 4px;
+    color: #888;
+    font-size: 11px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.sidebar-btn:hover {
+    background: #333;
+    color: #fff;
+}
+
+.sidebar-body {
+    overflow-y: auto;
+    flex: 1;
+    scrollbar-width: thin;
+    scrollbar-color: #333 transparent;
+}
+
+.sidebar-body::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar-body::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 2px;
+}
+
+/* Layer groups */
+.layer-group {
+    border-bottom: 1px solid #222;
+}
+
+.layer-group-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+
+.layer-group-header:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.layer-group-arrow {
+    font-size: 9px;
+    color: #555;
+    transition: transform 0.2s;
+    margin-left: auto;
+}
+
+.layer-group.collapsed .layer-group-arrow {
+    transform: rotate(-90deg);
+}
+
+.layer-group-icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    flex-shrink: 0;
+}
+
+.layer-group-name {
+    font-size: 11px;
+    font-weight: 700;
+    flex: 1;
+}
+
+.layer-items {
+    overflow: hidden;
+    max-height: 500px;
+    transition: max-height 0.25s ease;
+}
+
+.layer-group.collapsed .layer-items {
+    max-height: 0;
+}
+
+.layer-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px 5px 20px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.layer-item:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.layer-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.layer-name {
+    flex: 1;
+    font-size: 11px;
+    color: #ccc;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.layer-count {
+    font-size: 10px;
+    color: #555;
+    flex-shrink: 0;
+}
+
+.layer-checkbox-svg {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    display: block;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Sidebar toggle tab */
+#sidebar-toggle-tab {
+    position: absolute;
+    top: 50%;
+    left: 210px;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 40px;
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-left: none;
+    border-radius: 0 4px 4px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 401;
+    color: #555;
+    font-size: 10px;
+    transition: left 0.25s ease, color 0.15s;
+}
+
+#sidebar.collapsed+#sidebar-toggle-tab {
+    left: 0;
+}
+
+#sidebar-toggle-tab:hover {
+    color: #fff;
+    background: #242424;
+}
+
+/* ═══════════════════════════════
+   BOTTOM CENTRE LEGEND STRIP
+   ═══════════════════════════════ */
+#legend-strip {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(26, 26, 26, 0.92);
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    z-index: 400;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    white-space: nowrap;
+}
+
+.legend-label {
+    font-size: 10px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-right: 4px;
+}
+
+.legend-chip {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: #242424;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 11px;
+    color: #ccc;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.legend-chip:hover {
+    background: #2c2c2c;
+    color: #fff;
+}
+
+.legend-chip.active {
+    border-color: currentColor;
+    color: #fff;
+}
+
+.legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* ═══════════════════════════════
+   RIGHT SIDE — ENERGY MIX WIDGET
+   ═══════════════════════════════ */
+#energy-widget {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    width: 168px;
+    background: rgba(26, 26, 26, 0.92);
+    border: 1px solid #2a2a2a;
+    border-radius: 10px;
+    padding: 12px;
+    z-index: 400;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.widget-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.widget-header span {
+    font-size: 10px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.widget-view {
+    display: none;
+}
+
+.widget-view.active {
+    display: block;
+}
+
+.widget-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.widget-name {
+    font-size: 11px;
+    color: #fff;
+    width: 44px;
+    flex-shrink: 0;
+}
+
+.widget-bar-wrap {
+    flex: 1;
+    height: 4px;
+    background: #2a2a2a;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.widget-bar {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.4s ease;
+}
+
+.widget-pct {
+    font-size: 10px;
+    color: #666;
+    width: 26px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.widget-total {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid #2a2a2a;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.widget-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid #2a2a2a;
+}
+
+.widget-nav-btn {
+    background: #242424;
+    border: 1px solid #333;
+    border-radius: 4px;
+    color: #888;
+    font-size: 13px;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    font-family: 'Ubuntu Mono', monospace;
+}
+
+.widget-nav-btn:hover {
+    background: #333;
+    color: #fff;
+}
+
+.widget-nav-title {
+    font-size: 10px;
+    color: #888;
+    text-align: center;
+}
+
+/* Pipeline & Prices widget views */
+.pipe-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    font-size: 11px;
+}
+
+.pipe-name {
+    color: #ccc;
+}
+
+.pipe-tag {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: #242424;
+    border: 1px solid #333;
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.price-name {
+    font-size: 11px;
+    color: #ccc;
+}
+
+.price-val {
+    font-size: 11px;
+    color: #fff;
+    font-weight: 700;
+}
+
+.price-change-up {
+    color: #27ae60;
+    font-size: 10px;
+}
+
+.price-change-down {
+    color: #da3d20;
+    font-size: 10px;
+}
+
+/* ═══════════════════════════════
+   RIGHT SIDE — MAP CONTROLS
+   ═══════════════════════════════ */
+#map-controls {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 400;
+}
+
+.map-ctrl-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: #242424;
+    border: 1px solid #333;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-family: 'Ubuntu Mono', monospace;
+    position: relative;
+}
+
+.map-ctrl-btn:hover {
+    background: #333;
+}
+
+.map-ctrl-btn:active {
+    transform: scale(0.94);
+}
+
+/* Tooltip for Coming Soon */
+.map-ctrl-btn[data-tooltip]:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    right: calc(100% + 6px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 10px;
+    color: #ccc;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+/* ═══════════════════════════════
+   DARK LEAFLET POPUPS
+   ═══════════════════════════════ */
+.leaflet-popup-content-wrapper {
+    background: #1a1a1a !important;
+    border: 1px solid #2a2a2a !important;
+    border-radius: 8px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
+    color: #fff !important;
+    font-family: 'Ubuntu Mono', monospace !important;
+}
+
+.leaflet-popup-tip {
+    background: #1a1a1a !important;
+}
+
+.leaflet-popup-close-button {
+    color: #666 !important;
+}
+
+.leaflet-popup-close-button:hover {
+    color: #fff !important;
+}
+
+.popup-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+}
+
+.popup-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+    font-size: 11px;
+}
+
+.popup-label {
+    color: #666;
+    min-width: 64px;
+}
+
+.popup-val {
+    color: #ccc;
+}
+
+.popup-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.popup-chip.operational {
+    background: rgba(39, 174, 96, 0.2);
+    color: #27AE60;
+}
+
+.popup-chip.construction {
+    background: rgba(242, 201, 76, 0.2);
+    color: #F2C94C;
+}
+
+.popup-chip.planned {
+    background: rgba(128, 128, 128, 0.2);
+    color: #888;
+}
+
+.popup-type-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    background: #242424;
+    border: 1px solid #333;
+    color: #aaa;
+    text-transform: capitalize;
+}
+
+/* ═══════════════════════════════
+   CLUSTER ICONS
+   ═══════════════════════════════ */
+.marker-cluster-custom {
+    background: #555555 !important;
+    border: 2px solid #000 !important;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-family: 'Ubuntu Mono', monospace;
+    font-weight: 700;
+}
+
+.marker-cluster-custom div {
+    background: transparent !important;
+    text-align: center;
+    color: inherit;
+    font-weight: 700;
+    font-family: inherit;
+}
+
+/* ═══════════════════════════════
+   CUSTOM ASSET MARKERS
+   ═══════════════════════════════ */
+/* .marker-icon: wrapper for Figma m-*.svg full-bleed images (32x32) */
+.marker-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    transition: transform 0.15s;
+}
+
+.marker-icon:hover {
+    transform: scale(1.15);
+}
+
+.marker-icon img {
+    width: 32px;
+    height: 32px;
+    display: block;
+    border-radius: 8px;
+}
+
+/* ═══════════════════════════════
+   OVERLAY POLYGONS
+   ═══════════════════════════════ */
+.leaflet-overlay-pane .conflict-overlay {
+    fill: #F2994A;
+    fill-opacity: 0.25;
+    stroke: #F2994A;
+    stroke-width: 1;
+}
+
+.leaflet-overlay-pane .stress-overlay {
+    fill: #F2C94C;
+    fill-opacity: 0.2;
+    stroke: #F2C94C;
+    stroke-width: 1;
+}
+
+.leaflet-overlay-pane .alert-overlay {
+    fill: #E2B93B;
+    fill-opacity: 0.2;
+    stroke: #E2B93B;
+    stroke-width: 1;
+}
+
+/* ═══════════════════════════════
+   LEAFLET DARK TILE OVERRIDE
+   ═══════════════════════════════ */
+.leaflet-container {
+    background: #222;
+    font-family: 'Ubuntu Mono', monospace;
+}
+
+.leaflet-control-zoom {
+    display: none !important;
+}
+
+/* ═══════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════ */
+@media (max-width: 768px) {
+    #sidebar {
+        width: 180px;
+    }
+
+    #energy-widget {
+        display: none;
+    }
+}

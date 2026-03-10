@@ -1,0 +1,52 @@
+    <!-- ══════════════════════════════════════════════════
+     MAP ZONE
+══════════════════════════════════════════════════ -->
+    <div id="map-zone">
+
+        <!-- Leaflet map container -->
+        <div id="map"></div>
+
+        <!-- Left sidebar -->
+        <div id="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-title">Layer control</span>
+                <div class="sidebar-controls">
+                    <button class="sidebar-btn" title="Help" aria-label="Help"><i
+                            class="ti ti-question-mark"></i></button>
+                </div>
+            </div>
+            <div class="sidebar-body" id="sidebar-body"></div>
+        </div>
+        <!-- Sidebar toggle tab -->
+        <div id="sidebar-toggle-tab" title="Toggle sidebar" aria-label="Toggle sidebar">‹</div>
+
+        <!-- Legend strip (bottom centre) -->
+        <div id="legend-strip">
+            <span class="legend-label">Legend</span>
+        </div>
+
+        <!-- Energy mix widget (top right) -->
+        <div id="energy-widget">
+            <div id="widget-content"></div>
+            <div class="widget-nav">
+                <button class="widget-nav-btn" id="widget-prev" aria-label="Previous view">‹</button>
+                <span class="widget-nav-title" id="widget-nav-title">⚡ Energy Mix</span>
+                <button class="widget-nav-btn" id="widget-next" aria-label="Next view">›</button>
+            </div>
+        </div>
+
+        <!-- Map controls (right, vertically centred) -->
+        <div id="map-controls">
+            <button class="map-ctrl-btn" id="ctrl-zoom-in" title="Zoom in" aria-label="Zoom in"><i
+                    class="ti ti-plus"></i></button>
+            <button class="map-ctrl-btn" id="ctrl-zoom-out" title="Zoom out" aria-label="Zoom out"><i
+                    class="ti ti-minus"></i></button>
+            <button class="map-ctrl-btn" id="ctrl-reset" title="Reset view" aria-label="Reset view"><i
+                    class="ti ti-world"></i></button>
+            <button class="map-ctrl-btn" id="ctrl-pin" title="Pinned zones" aria-label="Pinned zones"
+                data-tooltip="Coming soon"><i class="ti ti-map-pin"></i></button>
+        </div>
+
+    </div><!-- end map-zone -->
+
+
