@@ -23,20 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /* ─────────────────────────────────────────────
-       2. SEGMENT PILLS  (All / Renewables / …)
-          Same pattern — active = blue
-    ───────────────────────────────────────────── */
-    const segmentPills = document.getElementById('segment-pills');
-    if (segmentPills) {
-        segmentPills.addEventListener('click', (e) => {
-            const pill = e.target.closest('.segment-pill');
-            if (!pill) return;
-            segmentPills.querySelectorAll('.segment-pill').forEach(p => p.classList.remove('active'));
-            pill.classList.add('active');
-        });
-    }
-
-    /* ─────────────────────────────────────────────
        3. REGION DROPDOWN
     ───────────────────────────────────────────── */
     setupDropdown({
@@ -151,21 +137,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /* ─────────────────────────────────────────────
        8. REFRESH / UPDATE BUTTON
-          Spins on click, shows version below
+          Spins on click
     ───────────────────────────────────────────── */
     const btnUpdate = document.getElementById('btn-update');
     const refreshIcon = document.getElementById('refresh-icon');
-    const versionInfo = document.getElementById('version-info');
 
-    if (btnUpdate && refreshIcon && versionInfo) {
+    if (btnUpdate && refreshIcon) {
         btnUpdate.addEventListener('click', () => {
             // Spin the icon
             refreshIcon.classList.add('spinning');
 
-            // Show version info
-            versionInfo.classList.add('visible');
-
-            // Stop spin after 1 cycle (700 ms) and keep version visible
+            // Stop spin after 1 cycle (700 ms)
             setTimeout(() => {
                 refreshIcon.classList.remove('spinning');
             }, 700);
@@ -263,6 +245,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Prevent clicks inside panels from bubbling to the global handler
     [alertsPanel, enerconDropdown].forEach(p => {
         if (p) p.addEventListener('click', (e) => e.stopPropagation());
+    });
+
+    // Bottom strip scroll → map shrinks
+    const bottomStrip = document.querySelector('.bottom-strip');
+    const mapZone = document.querySelector('.map-zone');
+
+    bottomStrip.addEventListener('scroll', () => {
+        const scrolled = bottomStrip.scrollTop;
+        const newHeight = Math.max(200, window.innerHeight * 0.6 - scrolled * 0.5);
+        mapZone.style.height = newHeight + 'px';
     });
 
 });
